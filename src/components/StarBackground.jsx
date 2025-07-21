@@ -1,90 +1,110 @@
-import { useState, useEffect } from "react";
+import { useEffect, useRef } from "react";
+import { motion } from "framer-motion";
 
 export const StarBackground = () => {
-    const [stars, setStars] = useState([]);
-    const [meteors, setMeteors] = useState([]);
+const canvasRef = useRef(null);
 
-    useEffect(() => {
-        generateStars();
-        generateMeteors();
+useEffect(() => {
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d");
 
+    const dpi = window.devicePixelRatio || 1;
 
-        const handleResize = () => {
-            generateStars();
-        };
-
-        window.addEventListener("resize", handleResize)
-        return () => window.removeEventListener("resize", handleResize);
-        
-    }, []);
-
-    const generateStars = () => {
-        const numberOfStars = Math.floor(window.innerWidth * window.innerHeight / 10000);
-        const newStars = [];
-
-        for (let i = 0; i < numberOfStars; i++) {
-            newStars.push({
-                id: i,
-                size: Math.random() * 3 + 1,
-                x: Math.random() * 100,
-                y: Math.random() * 100,
-                opacity: Math.random() * 0.5 + 0.5,
-                animationDuration: Math.random() * 4 + 2,
-            });
-        }
-
-        setStars(newStars);
+    const resizeCanvas = () => {
+    canvas.width = window.innerWidth * dpi;
+    canvas.height = window.innerHeight * dpi;
+    canvas.style.width = window.innerWidth + "px";
+    canvas.style.height = window.innerHeight + "px";
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.scale(dpi, dpi);
     };
 
-    const generateMeteors = () => {
-        const numberOfMeteors = 4
-        const newMeteors = [];
+    resizeCanvas();
+    window.addEventListener("resize", resizeCanvas);
 
-        for (let i = 0; i < numberOfMeteors; i++) {
-            newMeteors.push({
-                id: i,
-                size: Math.random() * 2 + 1,
-                x: Math.random() * 100,
-                y: Math.random() * 20,
-                delay: Math.random() * 15,
-                animationDuration: Math.random() * 3 + 3,
-            });
-        }
+    const dots = [];
+    const numDots = 140;
 
-        setMeteors(newMeteors);
+    for (let i = 0; i < numDots; i++) {
+    dots.push({
+        x: Math.random() * window.innerWidth,
+        y: Math.random() * window.innerHeight,
+        radius: 1.3 + Math.random() * 1.2,
+        dx: (Math.random() - 0.5) * 0.8,
+        dy: (Math.random() - 0.5) * 0.8,
+    });
+    }
+
+    const mouse = {
+    x: null,
+    y: null,
+    radius: Math.min(window.innerWidth, window.innerHeight) / 5,
     };
 
-    return (
-        <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-            {stars.map((star) => (
-                <div
-                    key={star.id}
-                    className="star animate-pulse-subtle absolute rounded-full bg-white"
-                    style={{
-                        width: star.size+"px",
-                        height: star.size+"px",
-                        left: star.x+"%",
-                        top: star.y+"%",
-                        opacity: star.opacity,
-                        animationDuration: star.animationDuration+"s",  
-                    }}
-                />
-            ))}
+    const handleMove = (e) => {
+    mouse.x = e.clientX;
+    mouse.y = e.clientY;
+    };
 
-            {meteors.map((meteor) => (
-                <div
-                    key={meteor.id}
-                    className="meteor animate-meteor"
-                    style={{
-                        width: meteor.size*30+"px",
-                        height: meteor.size*2+"px",
-                        left: meteor.x+"%",
-                        top: meteor.y+ "%",
-                        animationDelay: meteor.delay,
-                        animationDuration: meteor.animationDuration+"s",
-                    }}
-                />
-            ))}
-        </div>
-    );
+    const handleTouch = (e) => {
+    const touch = e.touches[0];
+    if (touch) {
+        mouse.x = touch.clientX;
+        mouse.y = touch.clientY;
+    }
+    };
+
+    window.addEventListener("mousemove", handleMove);
+    window.addEventListener("touchmove", handleTouch, { passive: true });
+
+    function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    for (let dot of dots) {
+        dot.x += dot.dx;
+        dot.y += dot.dy;
+
+        if (dot.x < 0 || dot.x > window.innerWidth) dot.dx *= -1;
+        if (dot.y < 0 || dot.y > window.innerHeight) dot.dy *= -1;
+
+        const dx = mouse.x - dot.x;
+        const dy = mouse.y - dot.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (distance < mouse.radius) {
+        const angle = Math.atan2(dy, dx);
+        dot.x -= Math.cos(angle) * 1.5;
+        dot.y -= Math.sin(angle) * 1.5;
+        }
+
+        ctx.beginPath();
+        ctx.arc(dot.x, dot.y, dot.radius, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
+        ctx.shadowColor = "white";
+        ctx.shadowBlur = 6;
+        ctx.fill();
+    }
+
+    requestAnimationFrame(animate);
+    }
+
+    animate();
+
+    return () => {
+    window.removeEventListener("resize", resizeCanvas);
+    window.removeEventListener("mousemove", handleMove);
+    window.removeEventListener("touchmove", handleTouch);
+    };
+}, []);
+
+return (
+    <motion.canvas
+    ref={canvasRef}
+    className="fixed inset-0 z-0"
+    style={{ touchAction: "none", pointerEvents: "auto" }}
+    initial={{ opacity: 0, scale: 0.95 }}
+    animate={{ opacity: 1, scale: 1 }}
+    transition={{ duration: 1.5, ease: "easeOut" }}
+    />
+);
 };
