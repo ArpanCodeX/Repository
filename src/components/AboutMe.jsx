@@ -1,5 +1,4 @@
 import { Briefcase, Code, User } from "lucide-react";
-// eslint-disable-next-line no-unused-vars
 import { motion } from "framer-motion";
 
 const cardVariants = {
@@ -7,7 +6,11 @@ const cardVariants = {
   visible: (i) => ({
     opacity: 1,
     y: 0,
-    transition: { delay: i * 0.3, duration: 0.5, ease: "easeOut" },
+    transition: {
+      delay: i * 0.3,
+      duration: 0.5,
+      ease: "easeOut",
+    },
   }),
 };
 
@@ -128,7 +131,9 @@ const AboutMe = () => {
                   </div>
                   <div>
                     <h4 className="font-semibold text-lg">{item.title}</h4>
-                    <p className="text-sm sm:text-base text-muted-foreground">{item.desc}</p>
+                    <p className="text-sm sm:text-base text-muted-foreground">
+                      {item.desc}
+                    </p>
                   </div>
                 </div>
               </motion.div>

@@ -1,14 +1,74 @@
-// eslint-disable-next-line no-unused-vars
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { ArrowDown } from "lucide-react";
 
 export const HeroSection = () => {
+  const roles = [
+    "Web Developer Engineer",
+  "MERN Stack Developer",
+  "MEAN Stack Developer",
+  "Frontend Developer",
+  "Backend Developer",
+  "Full-Stack Web Engineer",
+  "JavaScript Developer",
+  "React Developer",
+  "Node.js Developer",
+  "MongoDB Expert",
+  "Angular Developer",
+  "UI/UX Designer",
+  "Performance Optimizer",
+  "Clean Code Advocate",
+  "Software Engineer",
+  "Tech Enthusiast",
+  "Problem Solver",
+  "REST API Integrator",
+  "Web Accessibility Advocate",
+  "Responsive Design Expert",
+  "Open Source Contributor",
+  "Code Debugger",
+  "Web Animation Lover",
+  "Next.js Developer",
+  ];
+  const typingSpeed = 100;
+  const erasingSpeed = 50;
+  const delayBetweenRoles = 1500;
+
+  const [text, setText] = useState("");
+  const [roleIndex, setRoleIndex] = useState(0);
+  const [charIndex, setCharIndex] = useState(0);
+  const [isTyping, setIsTyping] = useState(true);
+
+  useEffect(() => {
+    const currentRole = roles[roleIndex];
+
+    if (isTyping) {
+      if (charIndex < currentRole.length) {
+        const timeout = setTimeout(() => {
+          setText(currentRole.substring(0, charIndex + 1));
+          setCharIndex((prev) => prev + 1);
+        }, typingSpeed);
+        return () => clearTimeout(timeout);
+      } else {
+        const timeout = setTimeout(() => setIsTyping(false), delayBetweenRoles);
+        return () => clearTimeout(timeout);
+      }
+    } else {
+      if (charIndex > 0) {
+        const timeout = setTimeout(() => {
+          setText(currentRole.substring(0, charIndex - 1));
+          setCharIndex((prev) => prev - 1);
+        }, erasingSpeed);
+        return () => clearTimeout(timeout);
+      } else {
+        setIsTyping(true);
+        setRoleIndex((prev) => (prev + 1) % roles.length);
+      }
+    }
+  }, [charIndex, isTyping, roleIndex, roles]);
+
   return (
     <section
       id="home"
-      // Base padding for mobile (px-4), increasing on larger screens (sm:px-6, lg:px-8)
-      // py-20 ensures good vertical spacing on all devices.
-      // min-h-screen makes sure it takes at least the full viewport height.
       className="relative min-h-screen flex flex-col items-center justify-center px-4 py-20 sm:px-6 lg:px-8 overflow-hidden text-foreground"
     >
       <motion.div
@@ -18,9 +78,6 @@ export const HeroSection = () => {
         transition={{ duration: 1, ease: "easeOut" }}
       >
         <motion.h1
-          // Font size adapts: 4xl on mobile, 6xl on medium screens.
-          // leading-tight helps prevent excessive line height with large text.
-          // mb-4 adds spacing below the heading.
           className="text-4xl md:text-6xl font-bold tracking-tight leading-tight mb-5"
           initial="hidden"
           animate="visible"
@@ -36,7 +93,6 @@ export const HeroSection = () => {
           {["Hi,", "I'm", "Arpan", "Khan"].map((word, i) => (
             <motion.span
               key={i}
-              // inline-block allows margin-right to work correctly.
               className={`inline-block mr-2 ${
                 i === 2 ? "text-primary" : i === 3 ? "text-gradient" : ""
               }`}
@@ -50,21 +106,13 @@ export const HeroSection = () => {
         </motion.h1>
 
         <motion.p
-          // Font size adapts: lg on mobile, xl on medium, 2xl on large.
-          // max-w-prose limits line length for readability on wide screens.
-          // mx-auto centers the paragraph content within its container.
-          // mt-4 for top margin, mb-8 for bottom margin (to button).
           className="text-lg md:text-xl lg:text-2xl text-muted-foreground mt-4 mb-8 font-medium max-w-prose mx-auto"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.2, duration: 1.5 }}
         >
-          {/* CRITICAL FOR MOBILE: This span relies on `white-space: normal;` in your CSS
-              to allow the text to wrap. The `overflow-hidden` and `border-r-2` are for the typing effect.
-              `block mx-auto` ensures the text is centered even if it wraps onto multiple lines. */}
-          <span className="animate-typing overflow-hidden border-r-2 border-muted pr-1 block mx-auto">
-            A passionate coder & tech enthusiast turning ideas into real-world
-            solutions.
+          <span className=" overflow-hidden border-r-2 border-muted pr-1 block mx-auto min-h-[2.5rem] animate-pulse">
+            Passionate about being <span className="text-primary">{text}</span>
           </span>
         </motion.p>
 
@@ -83,10 +131,9 @@ export const HeroSection = () => {
         </motion.div>
       </motion.div>
 
-      {/* Scroll indicator positioned absolutely at the bottom, centered. */}
       <motion.div
         className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center"
-        animate={{ y: [0, -10, 0] }} // Gentle floating animation
+        animate={{ y: [0, -10, 0] }}
         transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
       >
         <span className="text-muted-foreground text-sm mb-2 animate-pulse">
