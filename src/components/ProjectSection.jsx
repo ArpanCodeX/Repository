@@ -9,8 +9,8 @@ const projects = [
     description: "A simple password generator that generates a random password",
     image: "/Projects/image.png",
     tags: ["HTML/CSS", "JavaScript"],
-    demoUrl: "https://arpancodex.github.io/PassWordGenerator",
-    githubUrl: "https://github.com/ArpanCodeX/PassWordGenerator",
+    demoUrl: "https://makepasswords.vercel.app/",
+    githubUrl: "https://github.com/ArpanCodeX/PasswordGenerator-",
 },
 {
     id: 2,
